@@ -9,11 +9,6 @@
         querySelectorContent: 'main', //Selector of the main block of all page content, if null then the contents of the body tag will be replaced
         classActiveLink: '_active',
         init: false,
-        /*
-        If there is a need to distinguish plugin and native requests, you can specify additional fields. For example "spa".
-        The request will look like https://domain/about?spa
-        */
-        addToLink: null,
         status: STATUS_WAIT,
     };
 
@@ -168,18 +163,10 @@
 
         let match = link.match(new RegExp('#.*$'));
         link = (match ? link.replace(match[0], '') : link);
-        let requestLink = link;
 
-        if (_.addToLink) {
-            if (requestLink.indexOf('?') === -1) {
-                requestLink += '?' + _.addToLink;
-            } else {
-                requestLink += '&' + _.addToLink;
-            }
-        }
-
-        xhr.open('GET', requestLink, true);
+        xhr.open('GET', link, true);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.setRequestHeader('X-SPA', '1');
         xhr.setRequestHeader('Accept', 'text/html;q=0.9,*/*');
         xhr.send();
 
