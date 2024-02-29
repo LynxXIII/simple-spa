@@ -1,0 +1,10 @@
+version: "3.7"
+
+services:
+    simple-spa:
+        image: nginx
+        container_name: simple-spa
+        ports:
+            - "3001:80"
+        volumes:
+            - ./src:/usr/share/nginx/html
