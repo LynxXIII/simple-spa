@@ -1,2 +1,2 @@
 # simple-spa
-Plugin for easily adding spa features
+Plugin for easily adding Single Page Application features
