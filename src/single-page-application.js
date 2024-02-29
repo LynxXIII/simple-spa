@@ -4,15 +4,17 @@
     let _;
     const STATUS_WAIT = 0;
     const STATUS_SEND = 1;
-    const STATE_NORMAL = 0;
 
     const defaults = {
-        querySelectorContent: 'main', //Селектор главного блока всего контента страницы, если null то заменится содержимое тега body
+        querySelectorContent: 'main', //Selector of the main block of all page content, if null then the contents of the body tag will be replaced
         classActiveLink: '_active',
         init: false,
-        addToLink: '',
+        /*
+        If there is a need to distinguish plugin and native requests, you can specify additional fields. For example "spa".
+        The request will look like https://domain/about?spa
+        */
+        addToLink: null,
         status: STATUS_WAIT,
-        state: STATE_NORMAL,
     };
 
     function SPA() {
@@ -165,8 +167,18 @@
         xhr.withCredentials = true;
 
         let match = link.match(new RegExp('#.*$'));
-        link = (match ? link.replace(match[0], '') : link) + _.addToLink;
-        xhr.open('GET', link, true);
+        link = (match ? link.replace(match[0], '') : link);
+        let requestLink = link;
+
+        if (_.addToLink) {
+            if (requestLink.indexOf('?') === -1) {
+                requestLink += '?' + _.addToLink;
+            } else {
+                requestLink += '&' + _.addToLink;
+            }
+        }
+
+        xhr.open('GET', requestLink, true);
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
         xhr.setRequestHeader('Accept', 'text/html;q=0.9,*/*');
         xhr.send();
@@ -219,7 +231,8 @@
             const newElement = mainBlock.querySelector(pathDOM);
 
             contentElement.innerHTML = newElement.innerHTML;
-            contentElement.setAttribute('class', newElement.getAttribute('class'));
+            const classOnNewBlock = newElement.getAttribute('class');
+            if (classOnNewBlock) contentElement.setAttribute('class', classOnNewBlock);
         }
 
         markLink(link);
